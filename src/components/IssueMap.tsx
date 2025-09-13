@@ -1,3 +1,4 @@
+'use client';
 import React from 'react';
 import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
 import { Issue } from '../types';

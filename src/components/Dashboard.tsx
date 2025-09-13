@@ -1,3 +1,4 @@
+'use client';
 import React, { useState, useMemo, useEffect } from 'react';
 import { Issue, Status } from '../types';
 import { List, Zap, Truck, Droplets, Trash as TrashIcon, X } from './icons';
