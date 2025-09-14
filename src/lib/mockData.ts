@@ -1,137 +1,278 @@
-import { faker } from '@faker-js/faker';
 import { Issue, Notification } from '../types';
-import { Zap, Trash, Truck, CheckCircle2, AlertCircle } from '../components/icons';
+import { Zap, Trash, Truck, CheckCircle2, AlertCircle, Droplets } from '../components/icons';
 
-const departments = ['Electrical', 'Sewer', 'Road & Transport', 'Water', 'Sanitation'] as const;
-const priorities = ['Low', 'Medium', 'High', 'Critical'] as const;
-
-const sampleQuestions = [
-  'When will this be fixed?',
-  'Is this a safety hazard?',
-  'Should I evacuate the area?',
-  'Who is responsible for maintenance?',
-  'How long has this been an issue?',
-  'Is there a temporary solution?',
-  'What caused this problem?',
-  'Will there be any service interruption?'
+const staticIssues: Issue[] = [
+  {
+    id: 'RDT-001',
+    title: 'Large Pothole on Main Street',
+    description: 'A deep and dangerous pothole has formed near the intersection of Main St and 2nd Ave. It poses a significant risk to vehicles.',
+    department: 'Road & Transport',
+    status: 'Pending',
+    location: { lat: 16.508, lng: 80.64 },
+    locationAddress: '123 Main St, Vijayawada, 520002',
+    distance: 2.5,
+    imageUrl: 'https://images.unsplash.com/photo-1515162816999-a0c47dc192f7?q=80&w=800&auto=format&fit=crop',
+    submittedAt: new Date(new Date().setDate(new Date().getDate() - 2)),
+    resolvedAt: null,
+    userId: 'USR98765',
+    userContact: '9876543210',
+    notes: 'Multiple cars have reported tire damage.',
+    questions: ['When can we expect a repair crew?'],
+    priority: 'High',
+    resolvedImageUrl: null,
+    resolutionNotes: null,
+    resolvedBy: null,
+  },
+  {
+    id: 'ELC-002',
+    title: 'Streetlight Out on Park Avenue',
+    description: 'The streetlight at the corner of Park Avenue and 5th Street has been out for three nights, making the area very dark and unsafe.',
+    department: 'Electrical',
+    status: 'In Progress',
+    location: { lat: 16.495, lng: 80.655 },
+    locationAddress: '456 Park Avenue, Vijayawada, 520008',
+    distance: 1.8,
+    imageUrl: 'https://images.unsplash.com/photo-1620536392900-3443b3b5c432?q=80&w=800&auto=format&fit=crop',
+    submittedAt: new Date(new Date().setDate(new Date().getDate() - 4)),
+    resolvedAt: null,
+    userId: 'USR12345',
+    userContact: '9123456789',
+    notes: 'This is near a school, so it is a concern for evening walkers.',
+    questions: [],
+    priority: 'Medium',
+    resolvedImageUrl: null,
+    resolutionNotes: null,
+    resolvedBy: null,
+  },
+  {
+    id: 'SNT-003',
+    title: 'Overflowing Trash Can at City Park',
+    description: 'The main trash receptacle near the park entrance is overflowing, and garbage is spreading onto the lawn. It is attracting pests.',
+    department: 'Sanitation',
+    status: 'Resolved',
+    location: { lat: 16.515, lng: 80.63 },
+    locationAddress: 'City Park Entrance, Vijayawada, 520001',
+    distance: 3.1,
+    imageUrl: 'https://images.unsplash.com/photo-1611284446314-60a58ac073e5?q=80&w=800&auto=format&fit=crop',
+    submittedAt: new Date(new Date().setDate(new Date().getDate() - 5)),
+    resolvedAt: new Date(new Date().setDate(new Date().getDate() - 3)),
+    userId: 'USR54321',
+    userContact: '9543210987',
+    notes: 'The smell is becoming a major issue for park visitors.',
+    questions: ['Can we get more frequent pickups?'],
+    priority: 'Medium',
+    resolvedImageUrl: 'https://images.unsplash.com/photo-1582541896475-c7a51d720b02?q=80&w=800&auto=format&fit=crop',
+    resolutionNotes: 'The overflowing bin has been emptied, and the surrounding area has been cleaned. We have scheduled an additional weekly pickup for this location.',
+    resolvedBy: 'Ravi Kumar',
+  },
+  {
+    id: 'WTR-004',
+    title: 'Leaking Water Main on Krishna Rd',
+    description: 'There is a significant water leak from a pipe under the sidewalk. Water is pooling on the street and causing a hazard.',
+    department: 'Water',
+    status: 'Pending',
+    location: { lat: 16.50, lng: 80.66 },
+    locationAddress: '789 Krishna Rd, Vijayawada, 520010',
+    distance: 4.2,
+    imageUrl: 'https://images.unsplash.com/photo-1589947259695-8898a28125b3?q=80&w=800&auto=format&fit=crop',
+    submittedAt: new Date(new Date().setDate(new Date().getDate() - 1)),
+    resolvedAt: null,
+    userId: 'USR24680',
+    userContact: '9246801357',
+    notes: 'The leak seems to be getting worse.',
+    questions: ['Is the water supply safe to drink?'],
+    priority: 'Critical',
+    resolvedImageUrl: null,
+    resolutionNotes: null,
+    resolvedBy: null,
+  },
+  {
+    id: 'SWR-005',
+    title: 'Blocked Sewer Drain',
+    description: 'The sewer drain on Lotus Street is completely blocked, causing foul-smelling water to back up onto the road.',
+    department: 'Sewer',
+    status: 'In Progress',
+    location: { lat: 16.52, lng: 80.645 },
+    locationAddress: '101 Lotus Street, Vijayawada, 520003',
+    distance: 2.0,
+    imageUrl: 'https://plus.unsplash.com/premium_photo-1682309710921-b55a6a575544?q=80&w=800&auto=format&fit=crop',
+    submittedAt: new Date(new Date().setDate(new Date().getDate() - 6)),
+    resolvedAt: null,
+    userId: 'USR13579',
+    userContact: '9135792468',
+    notes: 'This is a recurring problem in this area.',
+    questions: [],
+    priority: 'High',
+    resolvedImageUrl: null,
+    resolutionNotes: null,
+    resolvedBy: null,
+  },
+  {
+    id: 'RDT-006',
+    title: 'Fallen Tree Blocking Side Road',
+    description: 'A large tree has fallen and is completely blocking access to a side road off Benz Circle.',
+    department: 'Road & Transport',
+    status: 'Resolved',
+    location: { lat: 16.49, lng: 80.67 },
+    locationAddress: 'Side road near Benz Circle, Vijayawada, 520010',
+    distance: 5.5,
+    imageUrl: 'https://images.unsplash.com/photo-1603895423626-62085b13531b?q=80&w=800&auto=format&fit=crop',
+    submittedAt: new Date(new Date().setDate(new Date().getDate() - 10)),
+    resolvedAt: new Date(new Date().setDate(new Date().getDate() - 9)),
+    userId: 'USR11223',
+    userContact: '9112233445',
+    notes: 'Fell during the storm last night.',
+    questions: [],
+    priority: 'High',
+    resolvedImageUrl: 'https://images.unsplash.com/photo-1587377190394-a9534a9599c9?q=80&w=800&auto=format&fit=crop',
+    resolutionNotes: 'Tree has been cut into sections and removed. The road is now clear.',
+    resolvedBy: 'Sita Sharma',
+  },
+  {
+    id: 'ERR-001',
+    title: 'Fake Report - Alien Sighting',
+    description: 'User reported seeing a UFO. This is clearly not a civic issue.',
+    department: 'Sanitation',
+    status: 'Error',
+    location: { lat: 16.5, lng: 80.65 },
+    locationAddress: 'Imaginary Lane, Vijayawada',
+    distance: 0,
+    imageUrl: 'https://images.unsplash.com/photo-1534796636912-3b95b3ab5986?q=80&w=800&auto=format&fit=crop',
+    submittedAt: new Date(new Date().setDate(new Date().getDate() - 15)),
+    resolvedAt: null,
+    userId: 'USR00000',
+    userContact: '9000000000',
+    notes: 'Marked as error due to being a prank report.',
+    questions: [],
+    priority: 'Low',
+    resolvedImageUrl: null,
+    resolutionNotes: null,
+    resolvedBy: null,
+  },
+  {
+    id: 'ELC-007',
+    title: 'Exposed Electrical Wiring',
+    description: 'An electrical box has been damaged, and live wires are exposed on the pavement. This is extremely dangerous.',
+    department: 'Electrical',
+    status: 'Pending',
+    location: { lat: 16.512, lng: 80.638 },
+    locationAddress: 'Near NTR Circle, Vijayawada, 520007',
+    distance: 1.2,
+    imageUrl: 'https://images.unsplash.com/photo-1616628188581-94a5e459042b?q=80&w=800&auto=format&fit=crop',
+    submittedAt: new Date(new Date().setHours(new Date().getHours() - 3)),
+    resolvedAt: null,
+    userId: 'USR77889',
+    userContact: '9778899001',
+    notes: 'Children play in this area. Needs immediate attention.',
+    questions: ['Can you shut off the power remotely?'],
+    priority: 'Critical',
+    resolvedImageUrl: null,
+    resolutionNotes: null,
+    resolvedBy: null,
+  },
+  {
+    id: 'SNT-008',
+    title: 'Illegal Dumping on Vacant Lot',
+    description: 'Someone has dumped a large amount of construction debris on the vacant lot at the end of Gandhi Street.',
+    department: 'Sanitation',
+    status: 'In Progress',
+    location: { lat: 16.485, lng: 80.642 },
+    locationAddress: 'Vacant Lot, Gandhi Street, Vijayawada, 520004',
+    distance: 3.8,
+    imageUrl: 'https://images.unsplash.com/photo-1599380333282-7f9b3b88a7b0?q=80&w=800&auto=format&fit=crop',
+    submittedAt: new Date(new Date().setDate(new Date().getDate() - 8)),
+    resolvedAt: null,
+    userId: 'USR33445',
+    userContact: '9334455667',
+    notes: 'This has been happening repeatedly.',
+    questions: ['Can a "No Dumping" sign be installed?'],
+    priority: 'Medium',
+    resolvedImageUrl: null,
+    resolutionNotes: null,
+    resolvedBy: null,
+  },
+  {
+    id: 'RDT-009',
+    title: 'Broken Pavement on Footpath',
+    description: 'The pavement slabs on the footpath are broken and uneven, creating a tripping hazard for pedestrians.',
+    department: 'Road & Transport',
+    status: 'Resolved',
+    location: { lat: 16.505, lng: 80.651 },
+    locationAddress: 'Footpath on MG Road, Vijayawada, 520010',
+    distance: 2.1,
+    imageUrl: 'https://images.unsplash.com/photo-1568695991055-c9973a879e61?q=80&w=800&auto=format&fit=crop',
+    submittedAt: new Date(new Date().setDate(new Date().getDate() - 20)),
+    resolvedAt: new Date(new Date().setDate(new Date().getDate() - 18)),
+    userId: 'USR66778',
+    userContact: '9667788990',
+    notes: 'An elderly person nearly fell here yesterday.',
+    questions: [],
+    priority: 'Low',
+    resolvedImageUrl: 'https://images.unsplash.com/photo-1582228963999-0a14a6b6b33b?q=80&w=800&auto=format&fit=crop',
+    resolutionNotes: 'The broken slabs were removed and replaced with new ones. The footpath is now level and safe.',
+    resolvedBy: 'Anjali Desai',
+  },
 ];
 
-const sampleNotes = [
-  'This issue has been recurring for the past few weeks.',
-  'Residents in the area have been complaining about this.',
-  'The problem seems to worsen during peak hours.',
-  'This is affecting multiple households in the vicinity.',
-  'Emergency response may be required.',
-  'Previous repairs were unsuccessful.',
-  'Weather conditions may have contributed to this issue.',
-  'Local business operations are being impacted.'
-];
-
-const sampleResolutionNotes = [
-  'Replaced the faulty transformer. Power restored.',
-  'Cleared the blockage and sanitized the area.',
-  'Patched the pothole and resurfaced the immediate area.',
-  'Fixed the leaking pipe. Water supply is back to normal.',
-  'Emptied the overflowing bin and scheduled more frequent pickups.'
-];
-
-export const createRandomIssue = (): Issue => {
-  const lat = faker.location.latitude({ min: 16.48, max: 16.52 });
-  const lng = faker.location.longitude({ min: 80.63, max: 80.67 });
-  const status = faker.helpers.arrayElement(['Pending', 'In Progress', 'Resolved', 'Error']);
-  const submittedAt = faker.date.recent({ days: 30 });
-  
-  let resolvedAt: Date | null = null;
-  let resolvedImageUrl: string | null = null;
-  let resolutionNotes: string | null = null;
-  let resolvedBy: string | null = null;
-
-  if (status === 'Resolved') {
-    resolvedAt = faker.date.between({ from: submittedAt, to: new Date() });
-    resolvedImageUrl = `https://picsum.photos/seed/${faker.string.uuid()}/400/400`;
-    resolutionNotes = faker.helpers.arrayElement(sampleResolutionNotes);
-    resolvedBy = faker.person.fullName();
-  }
-
-  return {
-    id: faker.string.alphanumeric(5).toUpperCase(),
-    title: faker.lorem.sentence(4),
-    description: faker.lorem.paragraph(),
-    department: faker.helpers.arrayElement(departments),
-    status,
-    location: { lat, lng },
-    locationAddress: `${faker.location.streetAddress()}, ${faker.location.city()}, ${faker.location.zipCode()}`,
-    distance: parseFloat(faker.number.float({ min: 0.5, max: 10, precision: 0.1 }).toFixed(1)),
-    imageUrl: `https://picsum.photos/seed/${faker.string.uuid()}/400/400`,
-    submittedAt,
-    resolvedAt,
-    userId: `USR${faker.string.alphanumeric(6).toUpperCase()}`,
-    userContact: faker.phone.number('9#########'),
-    notes: faker.helpers.arrayElement(sampleNotes),
-    questions: faker.helpers.arrayElements(sampleQuestions, { min: 0, max: 3 }),
-    priority: faker.helpers.arrayElement(priorities),
-    resolvedImageUrl,
-    resolutionNotes,
-    resolvedBy,
-  };
-};
-
-export const generateIssues = (count: number): Issue[] => {
-  return Array.from({ length: count }, createRandomIssue);
+export const generateIssues = (): Issue[] => {
+  // We return a deep copy to prevent mutations from affecting the original data during runtime
+  return JSON.parse(JSON.stringify(staticIssues)).map((issue: any) => ({
+    ...issue,
+    submittedAt: new Date(issue.submittedAt),
+    resolvedAt: issue.resolvedAt ? new Date(issue.resolvedAt) : null,
+  }));
 };
 
 export const generateNotifications = (count: number, issues: Issue[]): Notification[] => {
-  const issueRelatedTemplates = [
-    { icon: Zap, title: 'New Electrical Issue', baseDesc: 'A new high-priority electrical issue has been reported.' },
-    { icon: Trash, title: 'Sanitation Task Completed', baseDesc: 'was marked as resolved.' },
-    { icon: Truck, title: 'Dispatch Alert', baseDesc: 'A road & transport issue has been dispatched to your team.' },
-    { icon: AlertCircle, title: 'Critical Alert', baseDesc: 'A critical sewer issue requires immediate attention near' }
-  ];
-
-  const systemTemplates = [
-    { icon: CheckCircle2, title: 'System Update', description: 'The admin panel has been updated to v1.1.0.' }
-  ];
-
   const notifications: Notification[] = [];
 
-  for (let i = 0; i < count; i++) {
-    const isIssueRelated = faker.datatype.boolean({ probability: 0.8 }) && issues.length > 0;
-    let notification: Notification;
-
-    if (isIssueRelated) {
-      const template = faker.helpers.arrayElement(issueRelatedTemplates);
-      const randomIssue = faker.helpers.arrayElement(issues);
-      
-      let description = template.baseDesc;
-      if (template.title.includes('Completed')) {
-        description = `Issue #${randomIssue.id} ${template.baseDesc}`;
-      } else if (template.title.includes('Alert')) {
-        description = `${template.baseDesc} ${randomIssue.locationAddress.split(',')[0]}`;
-      } else {
-        description = `${template.baseDesc} (ID: #${randomIssue.id})`;
-      }
-
-      notification = {
-        id: faker.string.uuid(),
-        issueId: randomIssue.id,
-        icon: template.icon,
-        title: template.title,
-        description,
-        timestamp: faker.date.recent({ days: 3 }),
-        read: faker.datatype.boolean({ probability: 0.3 }),
-      };
-    } else {
-      const template = faker.helpers.arrayElement(systemTemplates);
-      notification = {
-        id: faker.string.uuid(),
-        icon: template.icon,
-        title: template.title,
-        description: template.description,
-        timestamp: faker.date.recent({ days: 3 }),
-        read: faker.datatype.boolean({ probability: 0.3 }),
-      };
-    }
-    notifications.push(notification);
+  const newIssueNotification = issues.find(i => i.status === 'Pending' && i.priority === 'Critical');
+  if (newIssueNotification) {
+    notifications.push({
+      id: 'notif-1',
+      issueId: newIssueNotification.id,
+      icon: AlertCircle,
+      title: 'Critical Alert',
+      description: `A new critical issue #${newIssueNotification.id} has been reported.`,
+      timestamp: new Date(newIssueNotification.submittedAt),
+      read: false,
+    });
   }
-  return notifications;
+
+  const resolvedIssueNotification = issues.find(i => i.status === 'Resolved');
+  if (resolvedIssueNotification) {
+    notifications.push({
+      id: 'notif-2',
+      issueId: resolvedIssueNotification.id,
+      icon: CheckCircle2,
+      title: 'Issue Resolved',
+      description: `Issue #${resolvedIssueNotification.id} has been marked as resolved.`,
+      timestamp: new Date(resolvedIssueNotification.resolvedAt!),
+      read: true,
+    });
+  }
+  
+  const inProgressNotification = issues.find(i => i.status === 'In Progress');
+  if (inProgressNotification) {
+    notifications.push({
+      id: 'notif-3',
+      issueId: inProgressNotification.id,
+      icon: Truck,
+      title: 'Dispatch Alert',
+      description: `Issue #${inProgressNotification.id} has been dispatched to a team.`,
+      timestamp: new Date(new Date(inProgressNotification.submittedAt).getTime() + 3600000), // Simulate 1 hour after submission
+      read: false,
+    });
+  }
+
+  notifications.push({
+    id: 'notif-4',
+    icon: CheckCircle2,
+    title: 'System Update',
+    description: 'The admin panel has been updated to v1.2.0 with new features.',
+    timestamp: new Date(new Date().setDate(new Date().getDate() - 1)),
+    read: true,
+  });
+
+  return notifications.slice(0, count).sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime());
 };

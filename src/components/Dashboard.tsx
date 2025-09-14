@@ -1,4 +1,3 @@
-'use client';
 import React, { useState, useMemo, useEffect } from 'react';
 import { Issue, Status } from '../types';
 import { List, Zap, Truck, Droplets, Trash as TrashIcon, X } from './icons';
@@ -7,6 +6,7 @@ import IssueList from './IssueList';
 import IssueMap from './IssueMap';
 import AnalyticsStats from './AnalyticsStats';
 import IssueTrendChart from './IssueTrendChart';
+import DepartmentalStats from './DepartmentalStats';
 
 const departmentIcons = {
   Electrical: <Zap className="w-8 h-8 text-yellow-500" />,
@@ -44,6 +44,20 @@ const Dashboard: React.FC<DashboardProps> = ({
 
   const analyticsRoles: (string | undefined)[] = ['Administrator', 'Department Head', 'Supervisor'];
   const canViewAnalytics = user && analyticsRoles.includes(user.role);
+  const canViewDepartmentStats = user && ['Staff', 'Department Head', 'Supervisor'].includes(user.role) && user.department !== 'Administration';
+
+  const departmentalStats = useMemo(() => {
+    if (!user || !user.department || user.role === 'Administrator') {
+      return { ongoing: 0, resolved: 0 };
+    }
+
+    const departmentIssues = issues.filter(i => i.department === user.department);
+
+    const ongoing = departmentIssues.filter(i => i.status === 'Pending' || i.status === 'In Progress').length;
+    const resolved = departmentIssues.filter(i => i.status === 'Resolved').length;
+
+    return { ongoing, resolved };
+  }, [issues, user]);
 
   const getFilteredIssuesForView = () => {
     const baseFilter = (issue: Issue) => {
@@ -191,7 +205,7 @@ const Dashboard: React.FC<DashboardProps> = ({
   };
 
   const showStatusToggle = activeView === 'dashboard';
-  const showStatsCards = activeView === 'dashboard';
+  const showStatsCards = activeView === 'dashboard' && (user?.role === 'Administrator' || user?.department === 'Administration');
 
   const getStatusCount = (status: Status) => {
     return issues.filter(issue => {
@@ -226,6 +240,14 @@ const Dashboard: React.FC<DashboardProps> = ({
           {getViewDescription()}
         </p>
       </div>
+
+      {canViewDepartmentStats && activeView === 'dashboard' && (
+        <DepartmentalStats
+          ongoingIssues={departmentalStats.ongoing}
+          resolvedIssues={departmentalStats.resolved}
+          departmentName={user.department!}
+        />
+      )}
       
       {canViewAnalytics && activeView === 'dashboard' && <AnalyticsStats issues={issues} />}
 

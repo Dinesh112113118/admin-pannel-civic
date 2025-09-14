@@ -1,7 +1,5 @@
-'use client';
 import React, { createContext, useContext, useState, ReactNode } from 'react';
 import { User, LoginCredentials } from '../types/auth';
-import { faker } from '@faker-js/faker';
 
 interface AuthContextType {
   user: User | null;
@@ -36,8 +34,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     
     // Mock authentication - in real app, validate against backend
     if (credentials.username && credentials.password) {
+      // Use static data instead of faker
       const newUser: User = {
-        id: `EMP${faker.string.numeric(6)}`,
+        id: `EMP123456`,
         username: credentials.username,
         email: `${credentials.username.toLowerCase().replace(' ', '.')}@municipality.gov.in`,
         department: credentials.department,
@@ -45,9 +44,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         shift: credentials.shift,
         location: credentials.location,
         lastLogin: new Date(),
-        joinDate: faker.date.past({ years: 5 }),
-        about: faker.lorem.paragraph(),
-        avatarUrl: faker.image.avatar(),
+        joinDate: new Date('2021-08-15T00:00:00Z'),
+        about: 'A dedicated and experienced administrator focused on improving civic infrastructure and response times.',
+        avatarUrl: `https://i.pravatar.cc/150?u=${credentials.username}`,
       };
       
       setUser(newUser);

@@ -1,4 +1,3 @@
-'use client';
 import React from 'react';
 import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
 import { Issue } from '../types';
@@ -23,7 +22,7 @@ const IssueMap: React.FC<IssueMapProps> = ({ issues, mapView }) => {
   const center: [number, number] = issues.length > 0 ? [issues[0].location.lat, issues[0].location.lng] : [16.5062, 80.6480];
 
   return (
-    <div className="h-[400px] w-full p-4">
+    <div className="h-[400px] w-full p-4 relative z-0">
       <MapContainer center={center} zoom={13} scrollWheelZoom={true} style={{ height: '100%', width: '100%', borderRadius: '12px' }}>
         {mapView && <ChangeView center={mapView.center} zoom={mapView.zoom} />}
         <TileLayer
